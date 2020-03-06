@@ -1,0 +1,36 @@
+爬取网站
+
+def get_price(city,cinema_name, show_time, film_name)
+    city : string
+    cinema_name: string
+    show_time : dic {'hour' : '09', 'minite' : '02'}
+    show_time 为电影放映时间 如09:02
+    film_name: string
+    price : 没有小数为int 有小数保留一位
+return price
+
+
+def get_cinema_url(city, cinema_name)
+    获取电影院的链接
+    类似
+    https://maoyan.com/cinema/1352?poi=45824
+    cinema_url
+    return cinema_url
+
+
+
+词云
+传入电影名称 返回词云图片的url地址 图片存在七牛云等图床
+def get_word_clode(film_name)
+    film_name : string
+    img_url : 图片地址
+    return img_url
+
+
+地图
+
+def get_distance(mylocation, targetlocation)
+    mylocation : string
+    targetlocation : string
+    distance : float 一位小数
+    return distance

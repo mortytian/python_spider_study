@@ -1,0 +1,266 @@
+爬虫：抓取网页数据的程序
+
+网页三大特点
+    1、网页都有自己唯一的url 网址
+    2、网页都是使用HTML编写的
+    3、网页都是用http或https协议来传输数据
+
+爬虫的设计思路：
+    1、确定要爬取的网页url地址
+    2、通过http或https协议来获取对应的HTML页面
+    3、提取HTML页面中的有用数据：
+        如果是需要的数据，直接保存
+        如果是页面里的其他url，则继续执行第二部
+
+urllib.request:
+    1、网页抓取，把url指定的网络资源，从网络中读取出来
+    urlopen:urlopen的参数，是一个url地址
+    Request：如果我们需要执行更复杂的操作，比如增加HTTP报头，
+             需要创建一个Request实例，作为urlopen的参数
+             而需要访问的url地址则作为Request实例的参数
+
+    新建Request实例，除了必须要由的url地址之外，还可以设置两个参数：
+    1、data(默认为空）：伴随url提交的数据（比如要post的数据），同时请求从 get 变为 post
+    2、headers（默认为空） 是一个字典，包含了要发送的HTTP报头的键值对
+
+    User-Agent:将程序伪装成浏览器
+    add_header:用Request实例增加header信息
+    也可以通过调用Request.get_header()来查看header信息
+    随机添加和修改User-Agent:
+        1、将user-agent放置于一个列表当中：
+        ua_list = [...]
+        2、随机选取一个
+        user_agent = random.choice(ua_list)
+
+urllib.parse模块中的编码解码：
+    1、编码： 编码工作使用urllib.parse的urlencode()函数，
+    将key:value转化成key=valus这样的字符串
+
+    2、解码：解码工作使用urllib.parse的unquote()函数
+    注意点：urllib.parse的urlencode()函数只针对字典类型
+
+    为什么需要编码：
+        HTTP请求数据，需要编码成URL编码格式
+        然后作为URL的一部分，或者作为参数传到Requset对象中
+
+
+get：
+    GRT请求一般用于我们向服务区获取数据
+    我们用百度搜索吴京: https://www.baidu.com/s?wd=吴京
+    浏览器会自动跳转为类似 https://www.baidu.com/s?wd=%E5%90%B4%E4%BA%A...
+
+post:
+    Request请求对象里有data参数
+    用于POST请求，传递data
+    data是一个字典，里面要匹配键值对
+
+post注意点：
+    经过urlencode转码
+    data = parse.urlencode(formdata).encode('utf-8')
+    如果Request()由data参数，那么这个请求就是POST
+    没有就是 GET
+
+
+ requests:
+    1、需要手动安装，类似于pygame
+    2、最基本的get请求可以直接用get()方法
+
+    添加headers和查询参数：
+        如果想添加headers，可以传入headers参数来增加请求头中的headers信息
+        如果要将参数放在url中传递，可以利用params参数
+
+    response = requests.get(url, params = none, headers = none)
+
+    response.text Requests会基于HTTP响应的文本编码自动解码响应内容
+    大多数Unicode字符集都能被无缝地解码 返回unicode格式的文本
+
+    response.content 时
+    返回的时服务器响应数据的原始二进制字节流，
+    可以用来保存图片等二进制文件
+
+基本POST请求(data参数)
+    response = requests.post(url,data)
+
+代理(proxies参数)
+    如果需要使用代理，可以通过任意请求方法提供
+    proxies 参数来配置单个请求
+    根据协议类型，选择不同的代理
+
+Cookies 和 Session
+    Cookies
+    如果一个响应包含了cookie，那么我们可以利用cookies参数拿到：
+
+    session:
+    session对象代表一次用户会话，从客户端浏览器连接服务器开始，
+    会话能让我们在跨请求时候保持某些参数
+    比如在同一个Session实例发出到所有请求之间保持cookie
+
+
+正则表达式:
+        匹配字符串，如果匹配上了，得到匹配结果
+        1、在正则表达式中如果直接给出了字符，就是精确匹配
+        2、用\d可以匹配一个数字，\w可以匹配一个字母或数字
+        '00\d'可以匹配'\007' 但无法匹配'00A'
+        '\d\d\d'可以匹配'010'
+        3、.可以匹配任意字符
+        4、用{n,m}表示 n-m个字符
+        \d{3}\s+\d{3,8}
+        \d{3,8} 3-8个数字
+        \s+ \s匹配空白字符 \s+至少一个空白字符
+        \d{3} 匹配三个数字
+
+        5、要做更精确地匹配，可以用[]表示范围
+        [0-9a-zA-Z\_]可以匹配一个数字、字母或者下划线
+        [0-9a-zA-Z\_]+可以匹配至少一个由数字、字母或下划线
+
+        组合使用：
+        A|B可以匹配A或B，所以(P|p)ython可以匹配 'python' 或'Python'
+
+        ^表示行的开头
+        ^\d 表示必须以数字开头
+
+re模块：
+    1、使用compile()函数将正则表达式的字符串形式编译为一个Pattern对象
+    2、通过Pattern对象提供的一系列方法对文本进行匹配查找，
+    获得匹配结果，一个Match对象
+    3、最后使用Match对象提供对属性和方法
+
+Pattern对象 常用方法
+    1、match方法：从启示位置开始查找，一次匹配
+    2、search方法，从任意位置开始查找，一次匹配
+    3、findall方法，全部匹配，返回列表
+    4、split方法 分隔字符串 返回列表
+    4、sub 方法 替换
+
+    贪婪模式与非贪婪模式
+    abbbc
+    使用贪婪的数量词的正则表达式 ab* 匹配结果 abbb
+    *决定了尽可能多匹配b 所以a后面所有的b都出现
+
+    使用非贪婪的正则表达式 ab*? 匹配结果 a
+    即使前面有 * 但是?决定了尽可能少匹配b 所以没有b
+
+xpath:可以在XML文档中查找信息
+    先将获取的HTML转换为XML，然后通过xpath，查找节点元素
+    XML:可扩展标记语言，目的是 传输和存储数据
+    HTML：超文本标记语言 目的是 更好的显示数据
+    HTML DOM:文档对象，通过它可以访问，HTML所有元素，包括属性，文本
+
+    节点关系:
+        1、父节点
+        2、子节点
+        3、兄弟节点
+        4、先辈节点
+        5、后代节点
+
+    xpath 采取的是路径表达式：
+    1、选取节点
+        /   :从跟节点选取
+        //  :从匹配选择的当前节点选取，不考虑位置
+        .   :选取当前节点
+        ..  :选取当前节点的父节点
+        @   :选取属性
+
+    2、选取未知节点：
+        *       :匹配任何元素节点
+        @*      :匹配任何属性节点
+        node()  :匹配任何类型节点
+
+lxml库: 解析HTML/XML
+    1、通过xpath获取标签信息(li)
+        html = etree.parse('./shuihu.html')
+        result = etree.xpath(..)
+
+bs4:(beautiful soup)
+    和lxml一样bs4也是HTML/XML的解析器
+    各种爬取方式的比较
+    1、正则：最快， 最难 无需安装
+    2、xpath(lxml)：速度 中等 难度中等
+
+使用:
+    1、导入bs4
+    from bs4 impore BeautifulSoup
+    2、创建 BeautifulSoup 对象
+    soup = BeautifulSoup(html, 'lxml')
+    3、格式化soup对象的内容
+    soup.prettify()
+
+    bs4 将复杂的HTML转化为复杂的树形结构
+    每个节点都是python对象
+    1、Tag
+    2、NavigableString
+    3、BeautifulSoup
+    4、Comment
+
+    Tag:就是HTML里面一个一个的标签
+    利用soup加标签名获取标签内容
+    这些对象的类型是bs4.element.Tag
+    但是注意，它查找的是所有内容中第一个符合标签的内容
+
+    对于Tag,它有两个重要的属性，是name和attrs
+    遍历文档树：
+    1、直接子节点: contents, children
+    tag的.contents属性可以将tag的子节点以列表的方式输出
+    print(soup.head.contents)
+    children 它返回的不是一个list，但是可以通过遍历获取所有子节点
+    它返回的是生成器对象
+
+
+    2、所有子孙节点：descendants属性
+    .descentadts属性可以对所有tag的子孙节点进行递归循环，
+    和children类似，我们也需要遍历获取其中的内容
+
+搜索文档树：
+    1. find_all(name, attrs, recursive, text, **kwargs)
+    name 参数
+    name参数可以查找所有名字为name的tag,字符串对象会被自动忽略掉
+    A.传字符串
+    最简单的过滤器是字符串，在搜索方法中传入一个字符串参数
+    会查找与字符串完成匹配的内容
+
+    B.传正则表达式
+    如果传入正则表达式作为参数
+    Beautiful Soup会通过正则表达式的match()来匹配内容
+
+    C.传列表
+    如果传入列表参数
+    会将与列表中任一元素匹配的内容返回
+
+    keyword参数
+
+    soup.find_all(id = 'link2')
+
+    CSS选择器:
+    作用与find_all相同，使用上有区别
+    使用:
+    1、标签名不加任何修饰
+    2、类名前加.
+    3、id名前加#
+    soup.select()进行元素的筛查
+    返回类型为list
+    1、通过标签名查找
+        print(soup.select('title'))
+    2、通过类名进行查找:
+        print(soup.select('.role'))
+    3、通过id名进行查找
+        print(soup.select('#link2'))
+    4、组合查找
+        查找p标签中,id等于link2的内容
+        print(soup.select('p #link2'))
+
+        直接自标签查找，则使用 > 分隔:
+        print(soup.selece('head > title'))
+
+    5、属性查找:
+        查找是还可以加入属性元素，属性需要用中括号扩起来
+        注意属性和标签属于同一节点，所以中间不能加空格，
+        否则会无法匹配到
+
+        print(soup.select('a[href="content"]')
+
+        get_text()获取内容
+
+        流程：
+        1、获取网页HTML
+        2、通过bs4转换为文档对象
+        3、搜索文档树
